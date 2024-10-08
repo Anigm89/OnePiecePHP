@@ -17,7 +17,16 @@ curl_close($ch);
 
 //var_dump($data);
 
+//paginacion
+$itemsPag = 15;
+$totalItems = count($data); //total de personajes
+$totalPages= ceil($totalItems / $itemsPag);  //calcula nº pags con 15 persoanjes
 
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1; // Página actual, por defecto 1
+
+//define el indice inicial  yfinal para los personajes a mostrar en esta pag
+$startIndex = ($page -1) * $itemsPag;
+$paginatedData = array_slice($data, $startIndex, $itemsPag);
 ?>
 
 <head>
@@ -31,14 +40,28 @@ curl_close($ch);
 <section>
     <h1>Personajes de One Piece</h1>
     <ul>
-        <?php foreach ($data as $personaje) : ?>
+        <?php foreach ($paginatedData as $personaje) : ?>
         <li>
             <h3><?= $personaje["name"] ?></h3>
-            <p>Age: <?= $personaje['age'] ?></p>
+            <p>Age: <?= isset($personaje['age']) ?  $personaje['age'] : 'undefined' ?></p>
             <p>Job: <?= $personaje['job'] ?> </p>
-            <p>Bounty: <?= $personaje['bounty']; ?></p>
+            <p>Bounty: <?= isset($personaje['bounty'] ) ?  $personaje['bounty'] : ' - '  ?></p>
         </li>
         <?php endforeach ; ?>
     </ul>
-
+    
+      <!-- Controles de paginación -->
+      <div class="pagination">
+        <?php if ($page > 1): ?>
+            <a href="?page=<?= $page - 1 ?>">Anterior</a>
+        <?php endif; ?>
+        
+        <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+            <a href="?page=<?= $i ?>" <?= $i == $page ? 'class="active"' : '' ?>><?= $i ?></a>
+        <?php endfor; ?>
+        
+        <?php if ($page < $totalPages): ?>
+            <a href="?page=<?= $page + 1 ?>">Siguiente</a>
+        <?php endif; ?>
+    </div>
 </section>
